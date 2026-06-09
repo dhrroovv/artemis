@@ -1,0 +1,111 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+*.dylib
+*.dll
+
+# Distribution / packaging
+.Python
+build/
+dist/
+downloads/
+develop-eggs/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+*.egg
+MANIFEST
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+pytest_cache/
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+# Type checkers / linters / analyzers
+.mypy_cache/
+.pyre/
+.pytype/
+.ruff_cache/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# Environments
+.env
+.env.*
+*.env
+.venv/
+venv/
+env/
+ENV/
+
+# Local Python version managers
+.python-version
+
+# IDEs / editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# SQLite / local databases
+*.sqlite3
+*.db
+
+# PyInstaller
+*.manifest
+*.spec
+
+# PEP 582
+__pypackages__/
+
+# Documentation builds
+docs/_build/
+
+# mkdocs
+/site
+
+# Static analysis / profiling
+dmypy.json
+.pytest_cache/
+.prof
+
+# Temporary files
+tmp/
+temp/
+.tmp/
+
+# Local secrets / credentials
+.secrets/
