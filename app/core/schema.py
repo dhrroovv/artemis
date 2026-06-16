@@ -1,4 +1,6 @@
 import re
+import uuid
+from datetime import datetime
 
 from pydantic import BaseModel, EmailStr, Field, field_validator
 
@@ -24,3 +26,11 @@ class UserCreate(BaseModel):
                 "Username not allowed. Username can only contain letter and underscore."
             )
         return value
+
+
+class UserCreateResponse(BaseModel):
+    id: uuid.UUID
+    username: str
+    email: str
+    created_at: datetime
+    updated_at: datetime
