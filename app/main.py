@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from sqlalchemy import text
 
+from app.api.routes import router
 from app.core.config import get_settings
 from app.core.logger import get_logger, setup_logging
 from app.db.session import engine
@@ -38,3 +39,4 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+app.include_router(router, prefix="/artemis")
