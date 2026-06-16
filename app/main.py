@@ -26,6 +26,7 @@ async def lifespan(app: FastAPI):
     try:
         async with engine.connect() as conn:
             await conn.execute(text("SELECT 1"))
+            logger.info("DB Health Check Passed.")
     except Exception:
         logger.error("Database connectivity check failed")
         raise
