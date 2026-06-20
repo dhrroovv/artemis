@@ -14,9 +14,14 @@ models inside app/core.
 
 
 class UserCreate(BaseModel):
-    username: str = Field(min_length=3, max_length=12)
+    username: str = Field(min_length=3, max_length=100)
     email: EmailStr
     password: str = Field(min_length=8)  # If not met, will raise 422 error
+    """
+    Status code 422 means Unprocessable entity \
+    Server understands the payload and is structurally correct, \
+    but may be due to validation error / business logic, cant be processed
+    """
 
     @field_validator("username")
     @classmethod
@@ -34,3 +39,8 @@ class UserCreateResponse(BaseModel):
     email: str
     created_at: datetime
     updated_at: datetime
+
+
+class UserLoginRequest(BaseModel):
+    email: EmailStr
+    password: str

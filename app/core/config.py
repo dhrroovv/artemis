@@ -1,3 +1,4 @@
+from datetime import timedelta
 from functools import lru_cache
 
 from pydantic import Field
@@ -9,7 +10,8 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = "INFO"
     JWT_SECRET_KEY: str
     JWT_ALGORITHM: str
-    ACCESS_TOKEN_EXPIRY: int = 3600
+    ACCESS_TOKEN_EXPIRY: timedelta = timedelta(minutes=15)
+    REFRESH_TOKEN_EXPIRY: timedelta = timedelta(hours=1)
 
     model_config = SettingsConfigDict(env_file=".env")
 

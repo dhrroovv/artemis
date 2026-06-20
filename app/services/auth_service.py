@@ -7,7 +7,7 @@ from app.core.security import Passwords
 from app.db.models import User
 
 
-class UserService:
+class UserAuthService:
     async def get_user_by_email(self, email: str, session: AsyncSession) -> User | None:
         s = select(User).where(User.email == email)
         result = await session.execute(s)
