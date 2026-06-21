@@ -1,3 +1,5 @@
+import uuid
+
 from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,6 +12,11 @@ from app.db.models import User
 class UserAuthService:
     async def get_user_by_email(self, email: str, session: AsyncSession) -> User | None:
         s = select(User).where(User.email == email)
+        result = await session.execute(s)
+        return result.scalar_one_or_none()
+
+    async def get_user_by_id(self, id: uuid.UUID, session: AsyncSession) -> User | None:
+        s = select(User).where(User.id == id)
         result = await session.execute(s)
         return result.scalar_one_or_none()
 

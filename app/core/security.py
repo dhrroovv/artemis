@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime, timedelta
+from typing import Any
 
 import jwt
 from pwdlib import PasswordHash
@@ -44,7 +45,7 @@ class AccessToken:
         return token
 
     @classmethod
-    def decode_token(cls, token: str) -> dict[str, str]:
+    def decode_token(cls, token: str) -> dict[str, Any]:
         try:
             token_data = jwt.decode(
                 jwt=token,

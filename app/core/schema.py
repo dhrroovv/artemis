@@ -41,6 +41,12 @@ class UserCreateResponse(BaseModel):
     updated_at: datetime
 
 
+class UserAuthenticatedResponse(BaseModel):
+    id: uuid.UUID
+    username: str
+    email: EmailStr
+
+
 class UserLoginRequest(BaseModel):
     email: EmailStr
     password: str

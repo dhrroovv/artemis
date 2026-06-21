@@ -4,8 +4,14 @@ from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import get_settings
+from app.core.dependencies import get_current_user
 from app.core.logger import get_logger
-from app.core.schema import UserCreate, UserCreateResponse, UserLoginRequest
+from app.core.schema import (
+    UserAuthenticatedResponse,
+    UserCreate,
+    UserCreateResponse,
+    UserLoginRequest,
+)
 from app.core.security import AccessToken, Passwords
 from app.db.session import get_db
 from app.services.auth_service import UserAuthService
@@ -72,15 +78,27 @@ async def login(
                 refresh=True,
                 td=settings.REFRESH_TOKEN_EXPIRY,
             )
-            response.set_cookie(key="access_token", value=access_token, httponly=True)
-            response.set_cookie(key="refresh_token", value=refresh_token, httponly=True)
+            response.set_cookie(
+                key="refresh_token", value=refresh_token, httponly=True, secure=True
+            )
             return {
                 "user": {"email": email, "uid": str(user.id)},
+                "access_token": access_token,
                 "detail": "Login succesful!",
             }
             # We could have used fastapi.JSONResponse here as well, its basically a sub-class of Response class \
-            # with all the methods like set_cookie, etc.
+            # with all the methods like set_cookie, etc. But that would have overwritten response functionality \
+            # we are currently using. Then we need to have set cookies/headers explicitly.
 
     raise HTTPException(
         status_code=401, detail="Incorrect username or password. Please try again."
     )
+
+
+@router.get(
+    "/me",
+    response_model=UserAuthenticatedResponse,
+    status_code=status.HTTP_200_OK,
+)
+async def me(request: Request, current_user=Depends(get_current_user)) -> Any:
+    return current_user
