@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import get_settings
-from app.core.dependencies import get_current_user
+from app.core.dependencies import get_current_user, refresh_current_token
 from app.core.logger import get_logger
 from app.core.schema import (
     UserAuthenticatedResponse,
@@ -102,3 +102,13 @@ async def login(
 )
 async def me(request: Request, current_user=Depends(get_current_user)) -> Any:
     return current_user
+
+
+@router.post("/refresh")
+async def refresh(request: Request, new_access_token=Depends(refresh_current_token)):
+    return new_access_token
+
+
+@router.post("/logout")
+async def logout():
+    pass

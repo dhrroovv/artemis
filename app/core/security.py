@@ -32,6 +32,10 @@ class AccessToken:
         td: timedelta = settings.ACCESS_TOKEN_EXPIRY,
         refresh: bool = False,
     ) -> str:
+        """
+        Eg:
+        user = {"email": user.email, "uid": user.id}
+        """
         payload = {}
         payload["user"] = user
         payload["exp"] = datetime.now() + td
@@ -54,5 +58,5 @@ class AccessToken:
             )
             return token_data
         except jwt.PyJWTError as e:
-            logger.warning(f"JWT decode failed: {e}")
+            logger.error(f"JWT decode failed: {e}")
             raise
