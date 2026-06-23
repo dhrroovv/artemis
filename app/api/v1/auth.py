@@ -110,5 +110,6 @@ async def refresh(request: Request, new_access_token=Depends(refresh_current_tok
 
 
 @router.post("/logout")
-async def logout():
-    pass
+async def logout(response: Response):
+    response.delete_cookie(key="refresh_token")
+    return {"detail": "Logged out successfully"}
