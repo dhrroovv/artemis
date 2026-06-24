@@ -79,7 +79,12 @@ async def login(
                 td=settings.REFRESH_TOKEN_EXPIRY,
             )
             response.set_cookie(
-                key="refresh_token", value=refresh_token, httponly=True, secure=True
+                key="refresh_token",
+                value=refresh_token,
+                httponly=True,
+                secure=(settings.ENV != "local"),
+                # secure=True means the cookie is meant to be sent over HTTPS only.
+                # If for local dev (where its http://localhost) the cookies will not be sent over if secure=True
             )
             return {
                 "user": {"email": email, "uid": str(user.id)},

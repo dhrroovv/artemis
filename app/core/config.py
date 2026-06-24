@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str
     ACCESS_TOKEN_EXPIRY: timedelta = timedelta(minutes=15)
     REFRESH_TOKEN_EXPIRY: timedelta = timedelta(days=1)
+    ENV: str
 
     model_config = SettingsConfigDict(env_file=".env")
 
