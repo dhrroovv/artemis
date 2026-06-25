@@ -1,398 +1,188 @@
-# Artemis - Search & Discovery Platform
+# Artemis
 
-A backend-first search platform built on top of a product catalog, supporting lexical search, semantic search, autosuggestions, analytics, authentication, background processing, and search quality monitoring.
+Artemis is a small FastAPI-based authentication service built mainly as a learning project.
 
-The goal of this project is not simply to expose a `/search` endpoint, but to build the supporting infrastructure required by a modern search system, including data ingestion, indexing, ranking, caching, analytics, and observability.
+I made this project to practice FastAPI and to understand how authentication is commonly handled in real-world systems. The focus here was learning by building: user signup, login, password hashing, JWT-based access tokens, refresh tokens, protected routes, cookie handling, and logout flows.
 
----
+This is not meant to be a full production-ready auth platform. It is a hands-on practice project that explores the core building blocks of an auth system using FastAPI, SQLAlchemy, PostgreSQL, and token-based authentication patterns.
 
-## Motivation
-
-Most search implementations stop at querying a database and returning results.
-
-Real-world search systems require much more:
-
-- Continuous synchronization from source systems
-- Search indexing pipelines
-- Query analytics
-- Ranking strategies
-- Autosuggestions
-- Semantic retrieval
-- Background processing
-- Rate limiting
-- Authentication and authorization
-- Monitoring and observability
-
-This project aims to explore those challenges while remaining approachable as a standalone backend application.
-
----
-
-## High-Level Architecture
-
-```text
-                    ┌─────────────────┐
-                    │ Authentication  │
-                    └────────┬────────┘
-                             │
-                             ▼
-
-                    ┌─────────────────┐
-                    │   Search API    │
-                    └────────┬────────┘
-                             │
-
-        ┌────────────────────┼────────────────────┐
-        ▼                    ▼                    ▼
-
-  Lexical Search      Semantic Search      Autosuggest
-        │                    │                    │
-        └────────────┬───────┴────────────┬───────┘
-                     ▼                    ▼
-
-                Ranking Layer       Cache Layer
-                     │
-                     ▼
-
-                 Search Results
-```
-
-### Data Pipeline
-
-```text
-Catalog Source
-      │
-      ▼
-
-Catalog Sync Worker
-      │
-      ▼
-
-Application Database
-      │
-      ├── Search Index Updates
-      ├── Embedding Generation
-      └── Analytics Processing
-```
-
----
-
-## Core Components
-
-### Authentication & Session Management
-
-Responsible for:
+## What this project covers
 
 - User registration
-- User login
-- JWT access tokens
-- Refresh tokens
-- Session management
-- Logout and session revocation
-- Role-based access control
+- User login with credential validation
+- Password hashing and verification
+- JWT access token creation
+- Refresh token creation and rotation flow basics
+- Protected routes using bearer token auth
+- `HttpOnly` refresh token cookies
+- Logout by clearing the refresh token cookie
+- Async database access with SQLAlchemy and PostgreSQL
 
-Planned endpoints:
+## Why I built this
 
-```http
-POST /auth/register
-POST /auth/login
-POST /auth/refresh
-POST /auth/logout
-GET  /auth/me
-GET  /auth/sessions
-DELETE /auth/sessions/{id}
-```
+The goal of this project was to get practical experience with questions like:
 
----
+- How does signup and login usually work in an API?
+- How are passwords stored securely?
+- What is the difference between access tokens and refresh tokens?
+- Why do some systems return one token in the response body and store another in cookies?
+- How do protected routes identify the currently authenticated user?
+- What does logout look like in a token-based system?
 
-### Catalog Ingestion
-
-Responsible for synchronizing catalog data from the source system into the application's data store.
-
-Features:
-
-- Periodic synchronization
-- Incremental updates
-- Retry handling
-- Background processing
-
-Future considerations:
-
-- Change Data Capture (CDC)
-- Event-driven synchronization
-
----
-
-### Search Engine
-
-Provides search capabilities across the catalog.
-
-Features:
-
-- Keyword search
-- Product discovery
-- Relevance ranking
-- Filtering
-- Pagination
-
-Planned search strategies:
-
-#### Lexical Search
-
-Traditional text-based retrieval:
-
-- PostgreSQL Full Text Search
-- BM25
-- Fuzzy matching
-- Synonym support
-
-#### Semantic Search
-
-Embedding-based retrieval:
-
-- Product embeddings
-- Query embeddings
-- Vector similarity search
-
-#### Hybrid Search
-
-Combines lexical and semantic search for improved relevance.
-
-Potential ranking techniques:
-
-- BM25
-- Vector similarity
-- Popularity signals
-- Freshness signals
-- Reciprocal Rank Fusion (RRF)
-
----
-
-### Autosuggest
-
-Provides real-time query suggestions.
-
-Example:
-
-```text
-Input: "sun"
-
-Suggestions:
-- sunscreen
-- sunblock
-- sun protection
-```
-
-Potential ranking signals:
-
-- Search frequency
-- Click-through rate
-- Recent trends
-
----
-
-### Analytics
-
-Captures user search behavior to improve search quality.
-
-Tracked events:
-
-```text
-Query
-Timestamp
-User
-Results Returned
-Clicked Product
-Search Latency
-```
-
-Potential dashboards:
-
-- Most searched queries
-- Zero-result searches
-- Popular products
-- Click-through rates
-- Search performance metrics
-
----
-
-### Background Workers
-
-Asynchronous workers process tasks that should not run during request handling.
-
-Examples:
-
-#### Catalog Sync Worker
-
-```text
-Source Catalog
-      ↓
-Sync
-      ↓
-Application Database
-```
-
-#### Embedding Worker
-
-```text
-Product Updated
-      ↓
-Generate Embedding
-      ↓
-Store Vector
-```
-
-#### Analytics Worker
-
-```text
-Search Event
-      ↓
-Queue
-      ↓
-Aggregation
-```
-
----
-
-## Planned Technology Stack
-
-### API Layer
+## Tech stack
 
 - FastAPI
-
-### Database
-
+- SQLAlchemy (async)
 - PostgreSQL
+- JWT-based authentication
+- `pwdlib` for password hashing
 
-### Cache
+## Authentication flow
 
-- Redis
+This project uses a split token approach:
 
-### Background Processing
+- On successful login, an `access_token` is returned in the response body.
+- A `refresh_token` is stored as an `HttpOnly` cookie.
+- Protected routes are accessed using `Authorization: Bearer <access_token>`.
+- When the access token expires, the refresh token can be used to request a new access token.
+- Logging out clears the refresh token cookie.
 
-- ARQ
-- Redis Queue
+This setup was useful for practicing how modern auth systems often separate short-lived access tokens from longer-lived refresh tokens.
 
-### Vector Search
+## API base path
 
-Potential options:
-
-- pgvector
-- Qdrant
-
-### Observability
-
-- OpenTelemetry
-- Prometheus
-- Grafana
-
-### Infrastructure
-
-- Docker
-- Docker Compose
-
----
-
-## Security
-
-Planned security features:
-
-- JWT authentication
-- Refresh token rotation
-- Session revocation
-- Password hashing
-- Role-based access control
-- API rate limiting
-- Request validation
-
----
-
-## API Roadmap
-
-### Search
+All auth-related routes are mounted under:
 
 ```http
-GET /search
-GET /search/suggestions
+/artemis/auth
 ```
 
-### Analytics
+## Available endpoints
 
-```http
-GET /analytics/top-searches
-GET /analytics/zero-results
-GET /analytics/popular-products
-```
+### `GET /artemis/auth/`
 
-### Admin
+Simple test endpoint.
 
-```http
-POST /admin/reindex
-POST /admin/sync-catalog
-GET  /admin/jobs
+**Response**
+
+```json
+"hello world"
 ```
 
 ---
 
-## Development Roadmap
+### `POST /artemis/auth/signup`
 
-### Phase 1
+Creates a new user account.
 
-- Authentication
-- Catalog ingestion
-- Basic search
-- Autosuggest
-- PostgreSQL integration
+**Request body**
 
-### Phase 2
+```json
+{
+  "email": "user@example.com",
+  "password": "your-password"
+}
+```
 
-- Full-text search
-- Ranking improvements
-- Fuzzy matching
-- Synonym support
+**Behavior**
 
-### Phase 3
-
-- Background workers
-- Redis integration
-- Search analytics
-
-### Phase 4
-
-- Embeddings
-- Vector search
-- Hybrid retrieval
-
-### Phase 5
-
-- Caching
-- Observability
-- Metrics
-- Tracing
-- Performance optimization
+- Checks whether the email already exists
+- Hashes the password before storing it
+- Creates and returns the new user
+- Returns `403 Forbidden` if the email is already registered
 
 ---
 
-## Learning Objectives
+### `POST /artemis/auth/login`
 
-This project is intended to provide hands-on experience with:
+Authenticates a user and issues tokens.
 
-- Backend architecture
-- Authentication systems
-- Session management
-- Search systems
-- Information retrieval
-- Vector databases
-- Background processing
-- Distributed system concepts
-- Caching strategies
-- Observability
-- Production-grade API design
-- Data pipelines
-- Search analytics
-- Ranking systems
+**Request body**
+
+```json
+{
+  "email": "user@example.com",
+  "password": "your-password"
+}
+```
+
+**Response behavior**
+
+- Verifies the user exists
+- Verifies the password against the stored hash
+- Returns an `access_token` in the response body
+- Sets a `refresh_token` as an `HttpOnly` cookie
+- Returns `401 Unauthorized` for invalid credentials
+
+**Example response**
+
+```json
+{
+  "user": {
+    "email": "user@example.com",
+    "uid": "user-id"
+  },
+  "access_token": "<jwt-access-token>",
+  "detail": "Login succesful!"
+}
+```
 
 ---
 
-## Current Status
+### `GET /artemis/auth/me`
 
-Project is currently in the planning and architecture phase.
+Returns the currently authenticated user.
+
+**Auth required**
+
+Send the access token in the `Authorization` header:
+
+```http
+Authorization: Bearer <access_token>
+```
+
+**Behavior**
+
+- Validates the access token
+- Resolves the current authenticated user
+- Returns user information for the active session
+
+---
+
+### `POST /artemis/auth/refresh`
+
+Generates a new access token using the refresh token.
+
+**Auth required**
+
+- Expects a valid `refresh_token` cookie
+
+**Behavior**
+
+- Validates the refresh token from the cookie
+- Returns a new access token if the refresh token is valid
+
+---
+
+### `POST /artemis/auth/logout`
+
+Logs the user out by clearing the refresh token cookie.
+
+**Behavior**
+
+- Deletes the `refresh_token` cookie
+- Returns a success message
+
+**Example response**
+
+```json
+{
+  "detail": "Logged out successfully"
+}
+```
+
+## Notes
+
+- In local development, cookie security behavior depends on environment settings.
+- The refresh token cookie is set as `HttpOnly`.
+- The project is intentionally focused on learning the mechanics of auth rather than covering every production hardening concern.
